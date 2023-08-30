@@ -1,0 +1,95 @@
+
+
+
+
+
+/* 
+.like{
+
+    font-family: sans-serif;
+} */
+.like a{
+    position: absolute;
+    transform: translate(-50%,-50%);
+    width: 42px;
+    height: 7px;
+    background: #fff;
+    border-radius: 75px;
+    /* line-height: 75px; */
+    text-align: center;
+    /* font-size: 30px; */
+    text-decoration: none;
+    color: #000000;
+    transition: .5s;
+
+}
+.like a.active{
+    background: transparent;
+    color: #ff0000;
+}
+.like a:before{
+    content: "";
+    position: absolute;
+    top: 5px;
+    left: 0;
+    background: #ff0000;
+    width: 38%;
+    height: 167%;
+    transition: .5s;
+    z-index: -1;
+    transform: translateX(-200px) rotate(-325deg);
+    opacity: 0;
+}
+.like a.active:before{
+    left: -23.5px;
+    transform: translateX(0px) rotate(35deg);
+    border-top-left-radius: 75px;
+    border-bottom-left-radius: 75px;
+    opacity: 1;
+}
+.like a:after{
+    content: "";
+    position: absolute;
+    top: 5px;
+    right: 0;
+    background: #ff0047;
+    width: 38%;
+    height: 167%;
+    transition: .5s;
+    z-index: -1;
+    transform: translateX(200px) rotate(325deg);
+    opacity: 0;
+}
+.like a.active:after{
+    right: 43.5px;
+    transform: translateX(0px) rotate(-35deg);
+    border-top-right-radius: 75px;
+    border-bottom-right-radius: 75px;
+    opacity: 1;
+}
+
+/* styles of profle images */
+
+.profile-image {
+    width: 125px;
+    height: 150px;
+    border-radius: 15%;
+    object-fit: cover;
+    -webkit-border-radius: 15%;
+    -moz-border-radius: 15%;
+    -ms-border-radius: 15%;
+    -o-border-radius: 15%;
+    margin-top: -117px;
+    margin-right: 58%;
+
+}
+
+  
+.quotes-icon{
+    position: absolute;
+    bottom: 27px;
+    right: 30px;
+}
+
+
+

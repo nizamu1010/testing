@@ -1,0 +1,50 @@
+
+{% load static %}
+
+<div class="container-fluid sticky-top" style="padding: 0%;">
+<header class="navbar flex-md-nowrap p-0 shadow" data-bs-theme="light" style="background-color: #000157;">
+<a class="navbar-brand fs-6 text-white" href="#">
+    <img class="justify-content-center" src="{% static 'img/fkrnlogo.png' %}" style=" width: 105px; height: 60px;"></img></a> 
+<ul class="navbar-nav flex-row d-md-none">
+    <li class="nav-item text-nowrap">
+        <!-- <a href="" class="nav-link px-3 ">
+
+            <i type="button" class="bi bi-bell-fill position-relative">
+                <span class="position-absolute top-50 ms-2 start-100 translate-middle badge rounded-pill text-danger">
+                  99+
+                </span>
+            </i>
+ 
+        </a> -->
+        </li>
+    <!-- <li class="nav-item text-nowrap">
+    <button class="nav-link px-3 " type="button" data-bs-toggle="collapse" data-bs-target="#navbarSearch" aria-controls="navbarSearch" aria-expanded="false" aria-label="Toggle search">
+        <i class="bi bi-search"></i>
+    </button>
+    </li> -->
+    <li class="nav-item text-nowrap">
+    <button class="nav-link px-3 text-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="bi bi-list text-light"></i>
+
+    </button>
+    </li>
+</ul> 
+
+<div id="navbarSearch" class="navbar-search w-100 collapse ">
+    <input class="form-control w-100 rounded-0 border-0" type="text" placeholder="search" aria-label="Search">
+</div>
+
+</header>
+
+{% if  not user.is_authenticated %}
+
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        Follow this link to discover the correct usage of our website 
+      <a class="ms-3" href="{% url 'authentication:login' %}" style="text-decoration: none; color: #000157;">login</a>
+    </div>
+    
+{% endif %}
+
+</div>
+
+

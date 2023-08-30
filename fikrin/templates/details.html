@@ -1,0 +1,231 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block 'title' %}Profile{% endblock 'title' %}
+
+{% block 'content' %}
+
+<style>
+  .image-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+  }
+
+  .image-container input[type="file"] {
+    display: none;
+  }
+
+  .col.p-0 {
+    padding: 0;
+  }
+
+  .cover-image img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+  }
+</style>
+
+
+<div class="row">
+  <div class="p-0"><i class=""></i>
+      <a class="cover-image d-block position-relative m-0 justify-content-end" href="">
+        <a href="{% url 'authentication:home' %}"> 
+          <i class="bi bi-house position-absolute text-light" style="top: 5px; left: 15px; font-size: small;"></i></a>
+        {% if user_profile.cover_image1 %}
+          <img src="{{ user_profile.cover_image1.url }}" alt="" style="width: 100%; height: 160px;">
+        {% else %}
+        <img src="{% static 'img/cover.jpg' %}" alt="" style="width: 100%; height: 160px;">
+        {% endif %}
+      </a> 
+
+
+  </div>
+
+
+<div class="container-fluid">
+  <div class="row ps-3">
+      <div class="col-md-6 offset-md-3">
+        <div class="position-relative">
+          <div class="profile-picture-wrapper">
+            <a href="">
+              {% if user_profile.profile_picture %}
+                <img src="{{ user_profile.profile_picture.url }}" alt="Profile Picture" class="profile-image ms-0">
+              {% else %}
+                <img src="{% static 'img/profile.jpg' %}" alt="Default Profile Picture" class="profile-image">
+              {% endif %}
+            </a>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+<div class="container"> 
+  <div class="profile-name mt-4 ps-3">
+    <div class="row">
+      <div class="col-md-3"></div>
+      <div class="col-md-6 col-10 d-flex justify-content-start">
+        <strong id="username">{{ user_profile.user.username }}</strong>
+        <input class="form-control d-none" id="username-input" name="username" type="text">
+      </div>
+      <div class="col-md-3 col-2 justify-content-start">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="container">
+  <div class="bio mt-3 ps-3">
+      <div class="row">
+        <div class="col-md-3"></div>
+        <div class=" col-md-6 col-10 d-flex justify-content-start">
+          <p id="bio" class="text-start">{% if user_profile.bio %}{{ user_profile.bio }}
+            {% else %}The user's biography is yet to be provided.{% endif %}</p>
+        </div>
+        <div class="col-md-3 col-2 d-flex justify-content-start">
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+
+<!-- mobile number visible or not -->
+
+<!-- <div class="container">
+  <div class="mobile-number mt-3">
+      <div class="row">
+        <div class="col-md-3 "></div>   
+        <div class="col-md-6 col-10 d-flex justify-content-start">
+          {% if user_profile.mobile_visible %}
+            <p id="mobile" class="text-start">{{ user_profile.mobile_number }}</p>
+          {% else %}
+            <p class="text-start">Mobile number is not visible</p>
+          {% endif %}
+        </div>
+        <div class="col-md-3 col-2 d-flex justify-content-start">
+        </div>
+      </div>
+  </div>
+</div> -->
+
+
+
+  
+<div class="container pb-5">
+  <div class="row mt-4">
+      {% for item in posts %}
+      <div class="col-sm-6 mt-3 mb-sm-0">
+          <div class="card shadow-lg p-1 bg-body rounded mx-3">
+              <div class="card-body">
+                  <div class="card-title">
+
+                      {% if item.profile_pic %}
+                      <img src="{{ item.profile_pic.url }}" alt="Profile Picture" class="rounded-5 me-4 border border-light" width="45" height="45">
+                      {% else %}
+                      <img src="{% static 'img/profile.jpg' %}" alt="Default Profile Picture" class="rounded-5 me-4 border border-light" width="45" height="45">
+                      {% endif %}
+
+                      <a class="fw-bold text-dark" style="text-decoration: none;">{{item.creater}}</a>
+                  
+
+                  </div>
+                  <div class="card-text mt-4">
+                    
+                      <style>
+              .content {
+                overflow: hidden;
+                max-height: 195px; /* Adjust this value as needed */
+              }
+            </style>
+            <div class="content">
+              <p style="white-space: pre-wrap;">{{ item.content_text }}</p>
+            </div>
+            <button class="btn btn-sm btn-link text-decoration-none" onclick="toggleContent(this)"
+            style="padding:0;">Read More</button>
+
+
+                  </div>
+                  <p class="card-text mt-2">
+                      <small class="text-body-secondary fw-lighter">
+                          Last updated {{ item.date_created|timesince }} ago
+                      </small>
+                  </p>
+              </div>
+
+              <!-- <div class="card-footer text-body-secondary align-items-center">
+                  <div class="row align-items-center mt-1">
+                      <div class="col text-center">
+                          <p class="like myButton"><a href="#"><small>Like</small></a></p>
+                      </div>
+                      <div class="col text-center">
+                          <button type="button" class="btn btn-outline-secondary position-relative myButton"
+                              style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+                              Comment
+                              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">99+
+                                  <span class="visually-hidden">unread messages</span>
+                              </span>
+                          </button>
+                      </div>
+                      <div class="col text-center myButton text-dark">
+                          <i class="bi bi-share-fill me-2"></i>
+                          <a class="text-dark" href="#" style="text-decoration:none; color:gray;"><small>Share</small></a>
+                      </div>
+                  </div>
+              </div> -->
+          </div>
+      </div>
+
+      {% endfor %}
+
+  </div>
+</div>
+
+<!-- read more script -->
+<script>
+  function toggleContent(button) {
+    var content = button.previousElementSibling;
+
+    if (content.style.overflow === "hidden") {
+      content.style.overflow = "visible";
+      content.style.maxHeight = "none";
+      button.innerText = "Read Less";
+    } else {
+      content.style.overflow = "hidden";
+      content.style.maxHeight = "195px"; // Adjust this value to match initial height
+      button.innerText = "Read More";
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    var contentDivs = document.querySelectorAll(".content");
+    
+    contentDivs.forEach(function(contentDiv) {
+      var words = contentDiv.textContent.trim().split(/\s+/).length;
+      var button = contentDiv.nextElementSibling;
+      
+      if (words <= 50) {
+        button.style.display = "none";
+      }
+    });
+  });
+</script>
+
+{% endblock 'content' %}
+
+
+
+
+
+

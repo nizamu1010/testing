@@ -1,0 +1,96 @@
+
+
+<!-- password changing -->
+
+<style>
+      .noti-window {
+      position: fixed;
+      bottom: -100%;
+      left: 0;
+      right: 0;
+      height: 40vh;
+      background-color: #f2f2f2;
+      transition: bottom 0.3s ease-in-out;
+      z-index: 999;
+      overflow-y: scroll;
+      padding: 20px;
+    }
+    
+    .window-content {
+      position: relative;
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    
+    #close-noti-button {
+      position: absolute; 
+      top: 10px;
+      right: 10px;
+      font-size: 24px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: #888;
+    }
+    
+    #close-noti-button:hover {
+      color: #333;
+    }
+</style>
+
+<div class="container">
+  <div class="row mt-3">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+      <a class="text-primary" id="open-noti-button" style="text-decoration: none;">Noti settings</a>
+    </div>
+  </div> 
+
+  <div id="custom-noti-window" class="noti-window ">
+    <div class="window-content">
+      <button id="close-noti-button">&times;</button>
+      <div class="header text-center">
+      <h5>Notification settings</h5>
+      <div>
+      <div class="body mt-5 text-start">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
+          <label class="form-check-label" for="flexSwitchCheckDefault">Post notifications</label>
+        </div>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
+          <label class="form-check-label" for="flexSwitchCheckDefault">Like notifications</label>
+        </div>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
+          <label class="form-check-label" for="flexSwitchCheckDefault">Comment notifications</label>
+        </div>
+      </div>
+
+      
+ 
+  
+    </div>
+  </div>
+</div>
+
+<script>
+  var openNotiButton = document.getElementById("open-noti-button");
+  var customNotiWindow = document.getElementById("custom-noti-window");
+  var closeNotiButton = document.getElementById("close-noti-button");
+
+  openNotiButton.addEventListener("click", function() {
+    customNotiWindow.style.bottom = "0";
+  });
+
+  closeNotiButton.addEventListener("click", function() {
+    customNotiWindow.style.bottom = "-100%";
+  });
+</script>
+
+
+
+

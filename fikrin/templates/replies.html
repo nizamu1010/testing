@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'content' %}
+
+<style>
+    /* Beautiful Comment Box Styles */
+    
+    .comment-box {
+      margin-top: 0;
+      padding-top: 0;
+      max-width: 600px;
+      background-color: #f9f9f9;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-bottom: 20px;
+      font-family: Arial, sans-serif;
+    }
+    
+    .comment-box .main-header {
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+      position: sticky;
+      top: 0;
+      background-color: #f9f9f9;
+      z-index: 1;
+    }
+    
+    .comment-box .header {
+        padding-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+        background-color: #f9f9f9;
+        z-index: 1;
+    }
+    
+    .comment-box .header h6 {
+      font-size: 15px;
+      color: #333;
+    }
+    
+    .comment-box .header a {
+      color: #888;
+      text-decoration: none;
+    }
+    
+    .comment-box .header a:hover {
+      color: #555;
+    }
+    
+    .comment-box .comment-content {
+      margin-bottom: 20px;
+    }
+    
+    .comment-box .comment-content p {
+      color: #333;
+      line-height: 1.6;
+    }
+    
+    .comment-box .comment-content .comment-info {
+      color: #888;
+      font-size: 14px;
+    }
+    
+    .comment-box .comment-content .comment-info i {
+      margin-right: 5px;
+    }
+    
+    .comment-box .comment-form {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .comment-box .comment-form textarea {
+        flex: 1;
+        resize: none;
+        border: 1px solid #ccc;
+        border-radius: 20px;
+        padding-top: 5px;
+        font-size: 14px;
+        padding-left: 15px;
+        height: 38px;
+    }
+    
+    .comment-box .comment-form button {
+        margin-left: 10px;
+        background-color: #fff;
+        color: #1b0dbe;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 23px;
+    }
+    
+    .comment-box .comment {
+      border-bottom: 1px solid #ccc;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+    }
+    
+    .comment-box .comment:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    
+    .comment-box .comment .comment-info {
+      color: #888;
+      font-size: 14px;
+    }
+    
+    .comment-box .comment .comment-info i {
+      margin-right: 5px;
+    }
+    
+    .comment-box .comment .comment-content {
+      margin-top: 10px;
+    }
+    
+    .comment-box .comment .comment-content p {
+      color: #333;
+      line-height: 1.6;
+    }
+    
+    .comment-box .comment .delete-comment-button {
+      color: #888;
+      font-size: 15px;
+      border: none;
+      background: none;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+    
+    .comment-box .comment .delete-comment-button:hover {
+      color: red;
+    }
+    </style>
+
+
+<div class="container p-0">
+    <div class="comment-box">
+        <!-- Header for reply view -->
+        <div class="main-header">
+            <div class="header">
+                <h6 class="text-center">Replies to {{ parent_comment.commenter }}</h6>
+                <a href="{% url 'authentication:home' %}" id="close-noti-button">
+                    <i class="bi bi-x-circle-fill"></i>
+                </a>
+            </div>
+            <div class="comment-content">
+                <p>{{ parent_comment.comment_content }}</p>
+            </div>
+                    
+            <form class="comment-form" method="post" action="{% url 'posting:replay_view' post.id parent_comment.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="parent_comment_id" value="{{ parent_comment.id }}">
+                <textarea name="comment_text" placeholder="Write a reply..." required minlength="1"></textarea>
+                <button type="submit"><i class="bi bi-check2"></i></button>
+            </form>
+        
+        </div>
+        <!-- End of Header -->
+
+        <div class="comments-section">
+            {% for reply in comments %}
+            <div class="comment">
+                <div class="comment-info">
+                    <img src="{% static 'img/profile.jpg' %}" class="rounded-circle border border-dark me-2" width="35" height="35" alt="Profile Image">
+                    {{ reply.commenter }}
+                    {% if request.user.is_authenticated and request.user.id == reply.commenter.id %}
+                    <button class="delete-comment-button" onclick="confirmDelete('{{ reply.id }}')" style="position: absolute; right: 25px;">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                    {% endif %}
+                </div>
+
+                <div class="comment-content">
+                    <p>{{ reply.comment_content }}</p>
+                    <small class="ms-0 text-muted">{{ reply.comment_time }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+
+  
+  <script>
+  function confirmDelete(postId) {
+    if (confirm("Do you want to delete this?")) {
+      // Redirect to the delete post URL
+      window.location.href = "{% url 'posting:delete_comment' %}?post_id=" + postId;
+    }
+  }
+  </script>
+
+{% endblock 'content' %}

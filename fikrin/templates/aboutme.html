@@ -1,0 +1,114 @@
+
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'title' %}about us{% endblock 'title' %}
+
+{% block 'content' %}
+
+<style>
+.container{
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+header {
+    background-color: #000157;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    color: #d5e0eb;
+}
+
+p {
+    margin-bottom: 20px;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.social-links a {
+    display: inline-block;
+    margin: 10px;
+    height: 40px;
+    color: #000157;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 40px;
+    font-size: 20px;
+    text-decoration: none;
+}
+
+/* .social-links a:hover {
+    background-color: #000157;
+} */
+</style>
+
+<header>
+    <h1>About Us</h1>
+    <a href="{% url 'authentication:home' %}"> 
+        <i class="bi bi-house position-absolute text-light" style="top: 5px; left: 15px; font-size: small;"></i></a>
+</header>
+
+<div class="container pt-5">
+        
+
+🌟 Welcome to Fikrin, an innovative social platform that promises to redefine your reading experience and ignite your
+ passion for literature. 📚✨<br><br>
+
+📖 <b>Explore Limitless Possibilities</b><br>
+At Fikrin, we invite you to dive into a vast database of books, annotations, quotes, and reviews, all waiting to be explored.
+ Uncover hidden literary gems, embark on thrilling adventures, and unravel profound narratives from a plethora of genres. <br><br>
+
+🖊️ <b>Express and Share</b><br>
+Our unique platform isn't just about reading; it's about embracing your inner writer. Sign up to unleash your creativity
+ and contribute your thoughts, ideas, and interpretations to our ever-growing database. Share your personal annotations,
+  craft insightful reviews, and even pen down your favorite quotes to inspire fellow readers. <br><br>
+
+🔍 <b>Discover Beloved Investigators</b><br>
+Ever wondered about the fictional private investigators that capture the imaginations of both writers and readers alike?
+ Fikrin offers you the chance to uncover these enigmatic characters, delving into the minds of creators and appreciators
+  as you unravel their mysteries and adventures. <br><br>
+
+🤝 <b>Community and Connection</b><br>
+Fikrin isn't just a website; it's a community of like-minded individuals who are passionate about the magic of words.
+ Connect with fellow book enthusiasts, exchange ideas, and engage in meaningful
+  discussions that enrich your literary journey. <br><br>
+
+🌐 <b>Seamless Experience</b><br>
+Our user-friendly interface ensures that navigating Fikrin is a breeze. Whether you're seeking new books to devour,
+ sharing your insights, or engaging in captivating conversations, our platform's intuitive design ensures a seamless
+  experience every step of the way. <br><br>
+
+🌈 <b>Your Gateway to Imagination</b><br>
+Fikrin isn't just an Indian social website; it's a portal to a world of imagination, knowledge, and connection.
+ It's where literature comes alive, and where your love for books finds a home. <br><br>
+
+Join us on this extraordinary journey as we celebrate the power of words, foster creativity,
+ and build a vibrant community of readers and writers. 
+ Experience Fikrin today and let your literary adventure begin! 📚🌍✍️
+        
+<div class="social-links">
+    <a href="https://www.instagram.com/fikrin.__/" class="text-decoration-none pt-0">Follow us</a>
+    <a href="https://www.instagram.com/fikrin.__/" target="_blank" title="Instagram" class="pt-0"><i class="fab fa-instagram"></i></a>
+</div>
+
+</div>
+
+
+{% endblock 'content' %}

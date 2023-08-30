@@ -1,0 +1,467 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block 'title' %}Profile{% endblock 'title' %}
+
+{% block 'content' %}
+
+<style>
+  .image-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+  }
+
+  .camera-icon {
+    font-size:larger ;
+      position: absolute;
+      top: 5px;
+      right: 6px;
+      border-radius: 20%;
+      cursor: pointer;
+      padding: 2px;
+      padding-top: 0px;
+      padding-left: 8px;
+      padding-right: 8px;
+
+  }
+
+  .camera-icon:hover {
+    background-color: #777272;
+  }
+
+  .image-container input[type="file"] {
+    display: none;
+  }
+
+  .col.p-0 {
+    padding: 0;
+  }
+
+  .cover-image img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+  }
+  
+  .save-button {
+        position: absolute;
+        top: 110px;
+        right: 20px;
+        display: none;
+      }
+
+  .dp-save{
+    position: absolute;
+    left: 40px;
+    top: -1px;
+    height: 25px;
+    padding: 0;
+    width: 42px;
+  }
+
+  #copyMessage {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 10px 20px;
+      background-color: #ffffff;
+      border: 1px solid #dddddd;
+      border-radius: 5px;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+      font-weight: bold;
+      font-size: 13px;
+      color: #150046;
+      z-index: 9999;
+  }
+
+    /* Style for the pen and trash icons */
+    .icon-container {
+        background-color: #f8f9fa;
+        border-radius: 50%;
+    }
+
+    .icon-container i {
+        font-size: 18px;
+        color: #6c757d;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .icon-container i:hover {
+        color: #030b7a;
+    }
+
+</style>
+
+
+<!-- cover image 1 -->
+<div class="row">
+  <div class="p-0">
+
+    <form action="{% url 'authentication:profile' %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <a class="cover-image d-block position-relative m-0 justify-content-end" href="">
+        <a href="{% url 'authentication:home' %}">
+          <i class="bi bi-house position-absolute text-light" style="top: 5px; left: 15px; font-size: small;"></i></a>    
+        {% if user_profile.cover_image1 %}
+          <img src="{{ user_profile.cover_image1.url }}" alt="" style="width: 100%; height: 160px;">
+        {% else %}
+          <img src="{% static 'img/cover.jpg' %}" alt="" style="width: 100%; height: 160px;">
+        {% endif %}
+        <input type="file" id="cover-image-input1" name="cover_image1" accept="image/*" style="display: none;">
+        <label for="cover-image-input1" class="camera-icon">
+          <i class="bi bi-camera-fill text-light" style="position:absolute; right: 20px; top: 105px;"></i>
+        </label>
+        <button type="submit" id="save-button1" class="save-button btn btn-light btn-sm" style="display: none;">Save</button>
+      </a>
+    </form>
+  </div>
+
+
+<!-- profile image -->
+<div class="container-fluid">
+  <div class="row ps-3">
+    <form action="{% url 'authentication:profile' %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="col-md-6 offset-md-3">
+        <div class="position-relative">
+          <div class="profile-picture-wrapper">
+            <i class="bi bi-camera-fill overlay text-dark " style="position:absolute; left: 95px;" id="camera-icon"></i>
+            <a href="">
+              {% if user_profile.profile_picture %}
+                <img src="{{ user_profile.profile_picture.url }}" alt="Profile Picture" class="profile-image border border-3 border-light ms-0">
+              {% else %}
+                <img src="{% static 'img/profile.jpg' %}" alt="Default Profile Picture" class="profile-image border border-3 border-light">
+              {% endif %}
+            </a>
+            <input type="file" id="profile-picture-input" name="profile_picture" accept="image/*" style="display: none;">
+          </div>
+          <button type="submit" id="save-button3" class="dp-save save-button btn btn-light btn-sm" style="display: none;">Save</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- username editing -->
+
+<div class="container"> 
+  <div class="profile-name mt-4 ps-3">
+    <form action="{% url 'authentication:profile' %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+    <div class="row align-items-center">
+      <div class="col-md-3"></div>
+      <div class="col-md-6 col-10 d-flex justify-content-start">
+        <strong id="username">{{ user_profile.user.username }}</strong>
+        <input class="form-control d-none" id="username-input" name="username" type="text">
+      </div>
+      <div class="col-md-3 col-2 justify-content-start">
+        <i id="edit-icon" class="bi bi-pen me-2" width="1.5em" height="1.5em" onclick="editProfile()"></i>
+        <button id="save-button" class="btn btn-link d-none" style="padding: 0; margin: 0;">
+          <i class="bi bi-check2" style="font-size:2em"></i>
+        </button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div>
+
+<!-- bio editing -->
+
+<div class="container">
+  <div class="bio mt-3 ps-3">
+    <form id="bio-form" action="{% url 'authentication:profile' %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="row align-items-center">
+        <div class="col-md-3"></div>
+        <div class=" col-md-6 col-10 d-flex justify-content-start">
+          <p id="bio" class="text-start">{% if user_profile.bio %}{{ user_profile.bio }}
+            {% else %}Please write your bio here to share more about yourself!{% endif %}</p>
+          <textarea id="bio-input" name="bio" class="form-control d-none">{% if user_profile.bio %}{{ user_profile.bio }}{% else %}Write a bio here{% endif %}</textarea>
+        </div>
+        <div class="col-md-3 col-2 d-flex justify-content-start">
+          <i id="edit-bio-icon" class="bi bi-pen me-2" width="1.5em" height="1.5em" onclick="editBio()"></i>
+          <button id="save-bio-button" class="btn btn-link d-none" style="padding: 0; margin: 0;">
+            <i class="bi bi-check2" style="font-size:2em"></i>
+
+          
+
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- mobile number editing -->
+
+<div class="container">
+  <div class="mobile-number mt-3 ps-3">
+    <form id="mobile-form" action="{% url 'authentication:profile' %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="row align-items-center">
+        <div class="col-md-3 "></div>   
+        <div class="col-md-6 col-10 d-flex justify-content-start">
+          <p id="mobile" class="text-start">{{ user_profile.mobile_number }}</p>
+
+          <input id="mobile-input" type="text" name="mobile_number" class="form-control d-none" value="{{ user_profile.mobile_number }}">
+        </div>
+        <div class="col-md-3 col-2 d-flex justify-content-start">
+          <i id="edit-mobile-icon" class="bi bi-pen me-2" width="1.5em" height="1.5em" onclick="editMobile()"></i>
+          <button type="submit" id="save-mobile-button" class="btn btn-link d-none" style="padding: 0; margin: 0;">
+            <i class="bi bi-check2" style="font-size:2em"></i>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% include 'change_pass.html' %}
+
+
+<section>
+  
+  <div class="container mt-3">
+    <div class="row ">
+        <!-- <div class="col"><a href="" class="btn btn-light text-black">My Posts</a></div> -->
+        {% comment %} <div class="col"><a href="" class="btn btn-light text-black">Saved</a></div> {% endcomment %}
+        <div class="col"><a href="{% url 'authentication:signout' %}" class="btn btn-light text-black" >Sighout</a></div>
+    </div>
+  </div> 
+  
+  <div class="container pb-5">
+    <div class="row mt-4">
+        {% for item in posts %}
+        <div class="col-sm-6 mt-3 mb-sm-0">
+            <div class="card shadow-lg p-1 bg-body rounded">
+                <div class="card-body">
+                    <div class="card-title">
+  
+                      <div class="icon-container position-absolute" style="right: 25px; bottom: 15px;">
+                        {% comment %} <i class="bi bi-pen" data-bs-toggle="modal" data-bs-target="#exampleModal{{ item.id }}" data-bs-placement="right"></i> {% endcomment %}
+                        <i class="bi bi-pen" data-bs-toggle="modal" data-bs-target="#edit_quotes{{ item.id }}" data-bs-placement="right"></i>
+                        <i class="bi bi-trash3 ms-4" onclick="confirmDelete('{{ item.id }}')"></i></div>
+
+                        <script>
+                          function confirmDelete(postId) {
+                              if (confirm("Do you want to delete this post?")) {
+                                  // Redirect to the delete post URL
+                                  window.location.href = "{% url 'posting:delete_post' %}?post_id=" + postId;
+                              }
+                          }
+                      </script>
+
+                      {% if item.profile_pic %}
+                      <img src="{{ item.profile_pic.url }}" alt="Profile Picture" class="rounded-5 me-4 border border-light" width="45" height="45">
+                      {% else %}
+                      <img src="{% static 'img/profile.jpg' %}" alt="Default Profile Picture" class="rounded-5 me-4 border border-light" width="45" height="45">
+                      {% endif %}
+  
+                        <a class="fw-bold text-dark" style="text-decoration: none;">{{item.creater}}</a>
+
+                    </div>
+                    <div class="card-text mt-4">
+
+                      <style>
+                        .content {
+                          overflow: hidden;
+                          max-height: 195px; /* Adjust this value as needed */
+                        }
+                      </style>
+                      <div class="content">
+                        <p style="white-space: pre-wrap;">{{ item.content_text }}</p>
+                      </div>
+                      <button class="btn btn-sm btn-link text-decoration-none" onclick="toggleContent(this)"
+                      style="padding:0;">Read More</button>
+
+                    </div>
+                    <p class="card-text mt-2">
+                        <small class="text-body-secondary fw-lighter">
+                            Last updated {{ item.date_created|timesince }} ago
+                        </small>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Modal for Editing Post Content -->
+        <div class="modal fade" id="edit_quotes{{ item.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="exampleModalLabel">Edit your quote</h1>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                      <form method="post" action="{% url 'posting:edit_post' item.id %}">
+                          {% csrf_token %}
+                          <div class="mb-3">
+                              <textarea class="form-control" name="edit_text" required minlength="50" style="height: 120px;">{{ item.content_text }}</textarea>
+                            </div>
+                          <div class="modal-footer">
+                              <button type="submit" class="btn btn-primary">Save</button>
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <!-- Modal for Editing Post Content End -->
+        
+  
+        {% endfor %}
+  
+    </div>
+  </div>
+  
+
+<!-- JavaScript -->
+<script>
+  // cover image 1
+  window.addEventListener('DOMContentLoaded', () => {
+    const fileInput1 = document.getElementById('cover-image-input1');
+    const coverImage1 = fileInput1.parentElement.querySelector('img');
+    const saveButton1 = document.getElementById('save-button1');
+
+    fileInput1.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          coverImage1.src = e.target.result;
+          saveButton1.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        coverImage1.src = '';
+        saveButton1.style.display = 'none';
+      }
+    });
+  });
+
+  // profile image
+  window.addEventListener('DOMContentLoaded', () => {
+    const cameraIcon = document.getElementById('camera-icon');
+    const profilePictureInput = document.getElementById('profile-picture-input');
+    const saveButton3 = document.getElementById('save-button3');
+    const profileImage = document.querySelector('.profile-image');
+
+    cameraIcon.addEventListener('click', () => {
+      profilePictureInput.click();
+    });
+
+    profilePictureInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          profileImage.src = e.target.result;
+          saveButton3.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        profileImage.src = '';
+        saveButton3.style.display = 'none';
+      }
+    });
+  });
+</script>
+
+
+<!-- username editing -->
+<script>
+  function editProfile() {
+    var usernameElement = document.getElementById("username");
+    var usernameInput = document.getElementById("username-input");
+    var editIcon = document.getElementById("edit-icon");
+    var saveButton = document.getElementById("save-button");
+
+    usernameElement.classList.add("d-none");
+    usernameInput.classList.remove("d-none");
+    editIcon.classList.add("d-none");
+    saveButton.classList.remove("d-none");
+
+    usernameInput.value = usernameElement.innerHTML;
+  }
+</script>
+<!-- profile name editing end -->
+
+<!-- bio editing -->
+<script>
+  function editBio() {
+    var bioElement = document.getElementById("bio");
+    var bioInput = document.getElementById("bio-input");
+    var editBioIcon = document.getElementById("edit-bio-icon");
+    var saveBioButton = document.getElementById("save-bio-button");
+
+    bioElement.classList.add("d-none");
+    bioInput.classList.remove("d-none");
+    editBioIcon.classList.add("d-none");
+    saveBioButton.classList.remove("d-none");
+
+    bioInput.value = bioElement.innerHTML;
+  }
+</script>
+
+
+
+<!-- mobile number editing -->
+<script>
+  function editMobile() {
+    var mobileElement = document.getElementById("mobile");
+    var mobileInput = document.getElementById("mobile-input");
+    var editMobileIcon = document.getElementById("edit-mobile-icon");
+    var saveMobileButton = document.getElementById("save-mobile-button");
+
+    mobileElement.classList.add("d-none");
+    mobileInput.classList.remove("d-none");
+    editMobileIcon.classList.add("d-none");
+    saveMobileButton.classList.remove("d-none");
+    mobileInput.value = mobileElement.innerHTML;
+  }
+</script>
+
+<!-- read more script -->
+<script>
+  function toggleContent(button) {
+    var content = button.previousElementSibling;
+
+    if (content.style.overflow === "hidden") {
+      content.style.overflow = "visible";
+      content.style.maxHeight = "none";
+      button.innerText = "Read Less";
+    } else {
+      content.style.overflow = "hidden";
+      content.style.maxHeight = "195px"; // Adjust this value to match initial height
+      button.innerText = "Read More";
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    var contentDivs = document.querySelectorAll(".content");
+    
+    contentDivs.forEach(function(contentDiv) {
+      var words = contentDiv.textContent.trim().split(/\s+/).length;
+      var button = contentDiv.nextElementSibling;
+      
+      if (words <= 50) {
+        button.style.display = "none";
+      }
+    });
+  });
+</script>
+
+{% endblock 'content' %}
+
+
+
+
+
+

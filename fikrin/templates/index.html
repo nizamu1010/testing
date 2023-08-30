@@ -1,0 +1,339 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'title' %}Fikrin{% endblock 'title' %}
+
+{% block 'content' %}
+
+<section>
+
+  {% include 'header.html' %}
+  {% include 'sidebar.html' %}
+
+<!-- Add the following CSS style to style the copy message -->
+<style>
+  #copyMessage {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 10px 20px;
+      background-color: #ffffff;
+      border: 1px solid #dddddd;
+      border-radius: 5px;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+      font-weight: bold;
+      font-size: 13px;
+      color: #150046;
+      z-index: 9999;
+  }
+
+    /* Style for the pen and trash icons */
+    .icon-container {
+        background-color: #f8f9fa;
+        border-radius: 50%;
+    }
+
+    .icon-container i {
+        font-size: 18px;
+        color: #6c757d;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .icon-container i:hover {
+        color: #030b7a;
+    }
+
+
+</style> 
+
+
+  <div class="container">
+    <div class="row pb-3">
+      {% for item in posts %}
+      <div class="col-sm-6 mt-3 mb-sm-0">
+        <div class="card shadow-lg p-1 bg-body rounded">
+          <div class="card-body">
+            <div class="card-title">
+              {% if request.user.is_authenticated and request.user.username == item.creater %}
+              <div class="icon-container position-absolute" style="right: 25px; bottom: 65px;">
+                <i class="bi bi-pen" data-bs-toggle="modal" data-bs-target="#edit_quotes{{ item.id }}" data-bs-placement="right"></i>
+                <i class="bi bi-trash3 ms-4" onclick="confirmDelete('{{ item.id }}')"></i></div>
+                {% endif %}
+                <script>
+                  function confirmDelete(postId) {
+                      if (confirm("Do you want to delete this post?")) {
+                          // Redirect to the delete post URL
+                          window.location.href = "{% url 'posting:delete_post' %}?post_id=" + postId;
+                      }
+                  }
+              </script>
+
+              {% if item.profile_pic %} 
+              <a href="{% if user.is_authenticated %}{% url 'authentication:creater_details' item.creater %}{% endif %}" style="text-decoration:none;">
+                <img src="{{ item.profile_pic.url }}" alt="Profile Picture" class="rounded-5 me-4" width="45" height="45">
+            </a>
+            
+              {% else %}
+              
+              <a href="{% if user.is_authenticated %}{% url 'authentication:creater_details' item.creater %}{% endif %}" style="text-decoration:none;">
+              <img src="{% static 'img/profile.jpg' %}" alt="Default Profile Picture" class="rounded-5 me-4" width="45" height="45">
+            </a>
+              {% endif %}
+
+              <a href="{% if user.is_authenticated %}{% url 'authentication:creater_details' item.creater %}{% endif %}" class="fw-bold text-dark" style="text-decoration: none;">{{item.creater}}</a>
+            </div>
+            <div class="card-text mt-4" {% if user.is_authenticated %} ondblclick="copyContent('{{ item.content_text|escapejs }}');" {% endif %}>
+
+            <style>
+              .content {
+                overflow: hidden;
+                max-height: 195px; /* Adjust this value as needed */
+              }
+            </style>
+            <div class="content">
+              <p style="white-space: pre-wrap;">{{ item.content_text }}</p>
+            </div>
+            <button class="btn btn-sm btn-link text-decoration-none" onclick="toggleContent(this)"
+            style="padding:0;">Read More</button>
+
+
+          </div>
+          <!-- Add the copy message element -->
+          <div id="copyMessage">Content copied!</div>
+
+            <p class="card-text mt-2"><small class="text-body-secondary fw-lighter">
+              Last updated {{ item.date_created|timesince }} ago
+            </small></p>
+            <div>
+              <div class="row">
+              <div class="col">
+                {% if item.likers.count > 0 %}
+                <small class="fst-italic">{{item.likers.count}} {{ item.likers.count|pluralize:"like,likes" }}</small>
+                {% endif %}
+                {% if item.comments.count > 0 %}
+                <small class="ms-2 fst-italic">{{item.comments.count}} {{ item.comments.count|pluralize:"comment,comments" }}</small>
+                {% endif %}
+              </div>
+            </div>
+            </div>
+          </div>
+          <div class="card-footer text-body-secondary align-items-center">
+            <div class="row align-items-center mt-1">
+              <div class="col text-center">
+                    <div>
+                        {% if user in item.likers.all %}
+                        {% if user.is_authenticated %}
+                          <a href="{% url 'posting:unlike_post' item.id %}" class="cancel text-danger text-decoration-none text-end" onclick="toggleLike({{ forloop.counter0 }}, {{ item.id }})">{% endif %}
+                            <i class="bi bi-heart-fill text-danger"></i>
+                            <small class="text-danger"><b>Liked</b></small>
+                          </a>
+                        {% else %} {% if user.is_authenticated %}
+                          <a href="{% url 'posting:like_post' item.id %}" class="like text-danger text-decoration-none text-end" onclick="toggleLike({{ forloop.counter0 }}, {{ item.id }})"> {% endif %}
+                            <i class="bi bi-heart text-danger"></i>
+                            <small class="text-danger"><b>Like</b></small>
+                          </a> 
+                        {% endif %}
+                      </div>
+              </div>
+              
+              <div class="col text-center">
+                <!-- <a href="{% url 'posting:comment_view' item.id %}" class="text-primary text-decoration-none">Comments</a> -->
+            </div>      
+              <div class="col text-start  text-dark">
+                <!-- <i class="bi bi-share-fill me-2"></i> -->
+                <!-- <a class="text-dark" href="#" style="text-decoration:none; color:gray;"><small>Share</small></a> -->
+                {% if user.is_authenticated %}
+                <small><a href="{% url 'posting:comment_view' item.id %}" class="text-decoration-none" style="color: #000157;"><b>Comments</b></a></small>
+                {% else %}
+                <small><a class="text-decoration-none" style="color: #000157;"><b>Comments</b></a></small>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+              <!-- Modal for Editing Post Content -->
+              <div class="modal fade" id="edit_quotes{{ item.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Edit your quote</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="post" action="{% url 'posting:edit_post' item.id %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <textarea class="form-control" name="edit_text" required minlength="50" style="height: 120px;">{{ item.content_text }}</textarea>
+                                  </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal for Editing Post Content End -->
+
+      {% endfor %}
+
+    </div>
+    </div>
+  </div>
+
+</section>
+
+ <!-- quotes popup -->
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Write a qoute</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="{% url 'posting:add_quote' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <textarea class="form-control" name="content-text" required minlength="50" style="height: 120px;"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </form>
+      </div>
+      
+      </div>
+  </div>
+</div>
+
+ <!-- quotes popup end-->
+
+
+<!-- quote icone start -->
+
+<div class="quotes-icon" style="position:fixed; right: 1%; bottom: 1%;" >
+  <a href="#" class="btn btn-link" title="Quotes" {% if user.is_authenticated %} data-bs-toggle="modal" {% endif %}
+   data-bs-target="#exampleModal" data-bs-placement="right">
+  <img src="{% static 'img/write.png' %}" alt="">
+  </a>
+</div> 
+
+
+<!-- like action js start -->
+<script>
+// Initialize an array to store the like states for each card
+let isLikedArray = new Array({{ posts|length }}).fill(false);
+
+function toggleLike(cardIndex) {
+  const likeButton = document.querySelectorAll('.like')[cardIndex];
+  const cancelButton = document.querySelectorAll('.cancel')[cardIndex];
+
+  if (isLikedArray[cardIndex]) {
+    isLikedArray[cardIndex] = false;
+    likeButton.style.display = 'inline-block';
+    cancelButton.style.display = 'none';
+    // Add code here to handle the cancellation of the like for the specific card (e.g., make an API call).
+  } else {
+    isLikedArray[cardIndex] = true;
+    likeButton.style.display = 'none';
+    cancelButton.style.display = 'inline-block';
+    // Add code here to handle the liking action for the specific card (e.g., make an API call).
+  }
+}
+
+</script>
+<!-- like action js end -->
+
+
+<!-- copy content_text -->
+<script>
+function copyContent(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textArea);
+    showCopyMessage();
+}
+
+function showCopyMessage() {
+    const copyMessage = document.getElementById("copyMessage");
+    copyMessage.style.display = "block";
+    setTimeout(function () {
+        copyMessage.style.display = "none";
+    }, 2000);
+}
+
+</script>
+<!-- copy content_text end -->
+
+
+<!-- read more script -->
+<script>
+  function toggleContent(button) {
+    var content = button.previousElementSibling;
+
+    if (content.style.overflow === "hidden") {
+      content.style.overflow = "visible";
+      content.style.maxHeight = "none";
+      button.innerText = "Read Less";
+    } else {
+      content.style.overflow = "hidden";
+      content.style.maxHeight = "195px"; // Adjust this value to match initial height
+      button.innerText = "Read More";
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    var contentDivs = document.querySelectorAll(".content");
+    
+    contentDivs.forEach(function(contentDiv) {
+      var words = contentDiv.textContent.trim().split(/\s+/).length;
+      var button = contentDiv.nextElementSibling;
+      
+      if (words <= 50) {
+        button.style.display = "none";
+      }
+    });
+  });
+</script>
+
+<!-- pwa script -->
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/static/sw.js')
+    .then(registration => {
+      console.log('Service Worker registered with scope:', registration.scope);
+    })
+    .catch(error => {
+      console.error('Service Worker registration failed:', error);
+    });
+  }
+</script>
+
+<script>
+  window.addEventListener('beforeinstallprompt', event => {
+    event.preventDefault();
+    const installButton = document.getElementById('install-button');
+    installButton.style.display = 'block';
+    installButton.addEventListener('click', () => {
+      event.prompt();
+    });
+  });
+</script>
+
+{% endblock 'content' %}
+
